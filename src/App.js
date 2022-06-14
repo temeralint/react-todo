@@ -9,21 +9,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import "./App.css";
 
-const buttons = [
-	{
-		type: "all",
-		label: "All",
-	},
-	{
-		type: "active",
-		label: "Active",
-	},
-	{
-		type: "done",
-		label: "Done",
-	},
-];
-
 class App extends Component {
 	state = {
 		todoData: [
@@ -43,7 +28,8 @@ class App extends Component {
 				done: true
 			},
 		],
-		searchValue: ''
+		searchValue: '',
+		filter: 'all'
 	}
 
 	addTodo = todoLabel => {
@@ -84,9 +70,24 @@ class App extends Component {
 		}))
 	}
 
+	updateFilter = filter => {
+		this.setState({filter})
+	}
+
+	getFilteredTodo = (items, filter) => {
+		switch (filter) {
+			case 'active':
+				return items.filter(item => item.done === false)
+			case 'done':
+				return items.filter(item => item.done)
+			default:
+				return items
+		}
+	}
+
 	render() {
-		const {todoData, searchValue} = this.state
-		const visibleData = this.getVisibleData(todoData, searchValue)
+		const {todoData, searchValue, filter} = this.state
+		const visibleData = this.getFilteredTodo(this.getVisibleData(todoData, searchValue), filter)
 
 		return (
 			<div className="todo-app">
@@ -95,7 +96,7 @@ class App extends Component {
 				<div className="top-panel d-flex">
 					<SearchPanel onSearch={this.onSearch}/>
 					<div className="btn-group">
-						<ItemFilter/>
+						<ItemFilter updateFilter={this.updateFilter} filter={filter}/>
 					</div>
 				</div>
 	
